@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="renderer" content="webkit">
+<title></title>
+<link rel="stylesheet" href="css/pintuer.css">
+<link rel="stylesheet" href="css/admin.css">
+<script src="js/jquery.js"></script>
+<script src="js/pintuer.js"></script>
+<script src="js/ajaxfileupload.js"></script> 
+</head>
+<body>
+<div class="panel admin-panel">
+  <div class="panel-head" id="add"><strong><span class="icon-pencil-square-o"></span> 歌曲管理 >> 修改歌曲 >> <label id="newTitle"></label></strong></div>
+  <div class="body-content">
+    <form method="post" id="news_form" class="form-x" action="">  
+      <div class="form-group">
+      <input type="hidden" id="nid" name="id"/>
+        <div class="label">
+          <label>歌曲名：</label>
+        </div> 
+        <div class="field">
+          <input type="text" class="input w50" value="" name="musicName" id="musicName" data-validate="required:请输入歌曲名" />
+          <div class="tips"></div>
+        </div>
+      </div>
+        
+      <div class="form-group">
+        <div class="label">
+          <label>歌  手：</label>
+        </div>
+       <div class="field">
+          <input type="text" class="input w50" value="" name="musicer" id="musicer" data-validate="required:请输入歌手" />
+          <div class="tips"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label">
+          <label>歌曲文件：</label>
+        </div>
+       <div class="field">
+         
+           <input type="text" class="input w50" readonly="readonly" value="" name="fileUrl" id="fileUrl" />
+         <br><br><br>
+          <input type="file" class="input w50" value="" name="file" id="file" data-validate="required:请选择歌曲" />
+          <div class="tips"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label">
+          <label></label>
+        </div>
+        <div class="field">
+          <button class="button bg-main icon-check-square-o" type="button" onclick="updateUser(2)"> 修改</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script type="text/javascript">
+
+	var thisURL = document.URL;  
+	var getval =thisURL.split('?')[1];  
+	var id= getval.split("=")[1];  
+	
+	$(function(){
+		if(id != 0 && id != null){
+			queryNewsId(id);
+		}else{
+			alert("參數非法");
+			window.location = 'NewsList.html';
+		}
+		
+	});
+	
+	function queryNewsId(id){
+		$.ajax({
+			url:"MusicById",
+			type:"POST",
+			data:{"id":id},
+			success:function(msg) {
+				if(msg.data){
+					$("#newTitle").html(msg.data.musicName);
+					$("#nid").val(msg.data.id);
+					$("#musicName").val(msg.data.musicName);
+					$("#musicer").val(msg.data.musicer);
+					
+					$("#fileUrl").val(msg.data.musicUrl);
+					
+				}
+			}
+	   });
+	} 
+
+	
+	
+	
+	function updateUser(type) {
+		
+		var musicname = $("#musicName").val();
+		var musicer = $("#musicer").val();
+		if( musicName == "" || musicer == ""){
+			alert("表单数据不合法，请检查是否填写完整");
+			return;
+		}
+		
+		$.ajaxFileUpload({  
+            url :'UpdateAndAddMusic?id='+ $("#nid").val() +'&type=' + type + '&musicname=' + encodeURI(encodeURI(musicname)) +'&musicer=' + encodeURI(encodeURI(musicer)) ,// servlet请求路径  
+            secureuri : false,  
+            fileElementId : 'file',// 上传控件的id  
+            dataType : 'json',  
+            success : function(msg) {  
+               
+                    alert("修改成功");
+                    window.location = 'MusicList.jsp';	
+				
+            },  
+            error : function(data, status, e) { 
+            	
+                alert('上传出错');  
+            }  
+            
+            
+        }); 
+		
+		
+		
+	
+	}
+	
+	
+</script>
+</body></html>
